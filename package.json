@@ -1,0 +1,11 @@
+{
+  "name": "fomoengine",
+  "version": "0.1.0",
+  "description": "Deterministic FOMO-mechanics detector — scan any page/text for engineered fear-of-missing-out, staged per the FOMOENGINE loop",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "test": "bun test",
+    "scan": "bun run bin/fomoscan.ts"
+  }
+}
