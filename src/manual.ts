@@ -6,7 +6,7 @@ export const MANUAL = {
   thesis:
     "One loop converts fear-of-missing-out into engagement, purchases, and capital flows. " +
     "Every stage corresponds to a quantified result in the literature or a documented platform mechanic.",
-  verified: "2026-07-10 · 66 claims through 3-lens adversarial panels · 0 refuted",
+  verified: "2026-07-10 · 78 claims through 3-lens adversarial panels · 0 refuted",
   artifact: "https://claude.ai/code/artifact/1c1de169-475a-4273-ade4-6c6cdb09a550",
   stages: [
     {

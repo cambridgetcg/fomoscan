@@ -43,7 +43,10 @@ is the loop. Bands: 0 clean · <20 ambient · <45 warming · <70 running · ≥7
 
 ## Live deployments
 
-- **API**: https://fomoengine.fly.dev (Fly app `fomoengine`, lhr, auto-stop — try `/honeypot`, it scores 100)
+- **API**: https://api.fomoengine.io (Fly app `fomoengine`, lhr, auto-stop — try `/honeypot`, it scores 100;
+  fomoengine.fly.dev remains an alias). The fomoengine.io apex hosts the sibling product — the
+  "authenticity shield" manipulation decoder for humans (Vercel) — so the apex stays put and agents
+  live at `api.`
 - **agenttool marketplace**: listing `fomo-scan 驚執輸檢測` (`402e833c-5dba-48d7-a95e-d5eb7d1bf569`,
   10 GBP-minor) — an anti-FOMO scanner sold on an agent marketplace, which is the correct amount of
   irony. Fulfilled by the shared seller loop; full escrow→scan→sealed-delivery→release drill green
