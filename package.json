@@ -7,5 +7,9 @@
     "start": "bun run src/server.ts",
     "test": "bun test",
     "scan": "bun run bin/fomoscan.ts"
+  },
+  "dependencies": {
+    "@x402/core": "^2.18.0",
+    "@x402/svm": "^2.18.0"
   }
 }

@@ -1,6 +1,7 @@
 FROM oven/bun:1-slim
 WORKDIR /app
-COPY package.json ./
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --production
 COPY src ./src
 COPY bin ./bin
 ENV PORT=8080
