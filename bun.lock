@@ -5,12 +5,18 @@
     "": {
       "name": "fomoengine",
       "dependencies": {
+        "@rhetorlint/core": "^0.1.1",
+        "@rhetorlint/rules-en": "^0.1.0",
         "@x402/core": "^2.18.0",
         "@x402/svm": "^2.18.0",
       },
     },
   },
   "packages": {
+    "@rhetorlint/core": ["@rhetorlint/core@0.1.1", "", {}, "sha512-xMvkmaJSY7ZMZNklDNO8Ra3Kz4euJxKXGMJRMOA7a6t7UMTmEEcG3x8+UyuqhJAnLr2SPN22zoUe0X1QyQfnvg=="],
+
+    "@rhetorlint/rules-en": ["@rhetorlint/rules-en@0.1.0", "", {}, "sha512-AW9/iEB+2wabagRv5aaPhOo2PhbR7ypoA6qu80GQkOFDTxdUmQc1qq5doFtCZEFwvVykOdkydzAwWwctbmKrTA=="],
+
     "@solana-program/compute-budget": ["@solana-program/compute-budget@0.11.0", "", { "peerDependencies": { "@solana/kit": "^5.0" } }, "sha512-7f1ePqB/eURkTwTOO9TNIdUXZcyrZoX3Uy2hNo7cXMfNhPFWp9AVgIyRNBc2jf15sdUa9gNpW+PfP2iV8AYAaw=="],
 
     "@solana-program/token": ["@solana-program/token@0.9.0", "", { "peerDependencies": { "@solana/kit": "^5.0" } }, "sha512-vnZxndd4ED4Fc56sw93cWZ2djEeeOFxtaPS8SPf5+a+JZjKA/EnKqzbE1y04FuMhIVrLERQ8uR8H2h72eZzlsA=="],

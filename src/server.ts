@@ -76,7 +76,7 @@ export async function handle(req: Request): Promise<Response> {
     return json({
       service: "fomoengine",
       endpoints: {
-        "POST /scan": "{ url } or { html } or { text } → staged FOMO diagnosis with receipts",
+        "POST /scan": "{ url } or { html } or { text } → staged FOMO diagnosis with receipts + a rhetorlint rhetoric block (nullable — see /openapi.json)",
         "GET /scan?url=…": "same, via query param",
         "GET /manual": "the FOMOENGINE framework as data (stages, tells, countermeasures, evidence)",
         "GET /honeypot": "a deliberately dark-patterned page for testing (should score ~100)",

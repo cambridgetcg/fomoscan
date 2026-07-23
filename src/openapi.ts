@@ -8,9 +8,9 @@ export function openapiDocument() {
     openapi: "3.0.3",
     info: {
       title: "fomoscan",
-      version: "0.2.0",
+      version: "0.3.0",
       description:
-        "Deterministic FOMO/manipulation detector: scans a page, HTML, or text for engineered fear-of-missing-out mechanics, staged per the FOMOENGINE loop with FTC-taxonomy receipts. Free doors: /manual (the framework as data) and /honeypot (a test page that should score ~100)." +
+        "Deterministic FOMO/manipulation detector: scans a page, HTML, or text for engineered fear-of-missing-out mechanics, staged per the FOMOENGINE loop with FTC-taxonomy receipts. Scans also carry a `rhetoric` block (rhetorlint/0.1 spec): rhetorical tells in the words — agentless passives, hedges, universal absolutes — reported alongside the FOMO score, never folded into it. `rhetoric` reads a declared bounded prefix on very large documents and is null only if the rhetoric analyzer itself fails (the scan is still delivered). Free doors: /manual (the framework as data) and /honeypot (a test page that should score ~100)." +
         (x402.enabled
           ? ` /scan is x402-paid (${x402.price} USDC on Solana via PAYMENT-SIGNATURE header); a failed scan is never charged.`
           : ""),

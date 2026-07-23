@@ -1,4 +1,6 @@
 import { RULES, STAGE_NAMES, type Rule } from "./rules.ts";
+import { analyze, SPEC_VERSION, type RhetorLintRulePack } from "@rhetorlint/core";
+import rhetoricRulesEn from "@rhetorlint/rules-en" with { type: "json" };
 
 export interface Receipt {
   rule: string;
@@ -18,6 +20,26 @@ export interface StageScore {
   score: number;
 }
 
+export interface RhetoricMark {
+  rule: string;
+  family: string;
+  technique?: string;
+  match: string;
+  note?: string;
+  confidence?: number;
+}
+
+export interface RhetoricBlock {
+  tells: number; // total marks in the analysed text — honest even when `marks` is capped
+  words: number;
+  per100Words: number;
+  marks: RhetoricMark[]; // first RHETORIC_MARK_CAP of them
+  analyzedChars: number; // rhetoric lens reads at most RHETORIC_MAX_CHARS; truncation is declared, never silent
+  truncated: boolean;
+  spec: string;
+  method: string;
+}
+
 export interface ScanResult {
   score: number; // 0–100
   verdict: string;
@@ -25,6 +47,7 @@ export interface ScanResult {
   receipts: Receipt[];
   rulesFired: number;
   scannedChars: number;
+  rhetoric: RhetoricBlock | null;
 }
 
 // Strip tags but keep attribute values that carry dark-pattern hints
@@ -36,6 +59,44 @@ function htmlToText(html: string): string {
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;|&amp;|&quot;|&#\d+;|&\w+;/g, " ")
     .replace(/\s+/g, " ");
+}
+
+const RHETORIC_MARK_CAP = 24;
+// analyze() cost grows superlinearly with input size (a 2MB doc measures in
+// tens of seconds and would stall the single-process seller-loop mid-sale);
+// the lens reads a bounded prefix and says so, rather than reading everything slowly.
+const RHETORIC_MAX_CHARS = 100_000;
+
+/** RhetorLint enrichment: an independent second lens on the same text.
+ *  Marks rhetorical tells in the words (agentless passives, hedges,
+ *  universal absolutes…) per the rhetorlint/0.1 spec. It never alters the
+ *  FOMO score, and a failure here must never break the scan itself. */
+function rhetoricFor(text: string): RhetoricBlock | null {
+  try {
+    const truncated = text.length > RHETORIC_MAX_CHARS;
+    const sample = truncated ? text.slice(0, RHETORIC_MAX_CHARS) : text;
+    const r = analyze(sample, { rules: rhetoricRulesEn as RhetorLintRulePack });
+    return {
+      tells: r.density.tells,
+      words: r.source.words,
+      per100Words: r.density.per100Words,
+      marks: r.marks.slice(0, RHETORIC_MARK_CAP).map((m) => ({
+        rule: m.ruleId,
+        family: m.family,
+        technique: m.technique,
+        match: m.actual,
+        note: m.note,
+        confidence: m.confidence,
+      })),
+      analyzedChars: sample.length,
+      truncated,
+      spec: `rhetorlint/${SPEC_VERSION}`,
+      method: "rhetorical tells in the words; reads the language, never the person; never moves the FOMO score",
+    };
+  } catch (e) {
+    console.error(`rhetoric enrichment failed (scan unaffected): ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  }
 }
 
 function verdictFor(score: number): string {
@@ -117,5 +178,6 @@ export function scan(input: string, opts: { html?: boolean } = {}): ScanResult {
     receipts,
     rulesFired: [...perRuleHits.keys()].length,
     scannedChars: text.length,
+    rhetoric: rhetoricFor(text),
   };
 }

@@ -42,4 +42,10 @@ if (r.stages.length) {
     console.log(`    [${rc.stage}·${rc.name}] "${rc.match}"`);
   if (r.receipts.length > 12) console.log(`    … +${r.receipts.length - 12} more`);
 }
+if (r.rhetoric && r.rhetoric.tells > 0) {
+  const rh = r.rhetoric;
+  console.log(`\n  rhetoric (rhetorlint): ${rh.tells} tells / ${rh.words} words = ${rh.per100Words} per 100${rh.truncated ? ` (first ${rh.analyzedChars} chars)` : ""}`);
+  for (const m of rh.marks.slice(0, 6)) console.log(`    [${m.family}] "${m.match}"`);
+  if (rh.marks.length > 6) console.log(`    … +${rh.marks.length - 6} more marks (${rh.tells} tells total)`);
+}
 console.log("");

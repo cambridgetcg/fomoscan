@@ -56,4 +56,60 @@ describe("fomoengine detector", () => {
       expect(rc.ref.length).toBeGreaterThan(0);
     }
   });
+
+  test("rhetoric block rides along with real marks on spun prose", () => {
+    const r = scan("Mistakes were made. Everyone knows this is guaranteed to work, always.", { html: false });
+    expect(r.rhetoric).not.toBeNull();
+    expect(r.rhetoric!.tells).toBeGreaterThan(0);
+    expect(r.rhetoric!.per100Words).toBeGreaterThan(0);
+    expect(r.rhetoric!.spec).toBe("rhetorlint/0.1");
+    for (const m of r.rhetoric!.marks) {
+      expect(m.match.length).toBeGreaterThan(0);
+      expect(m.family.length).toBeGreaterThan(0);
+      expect(m.rule.length).toBeGreaterThan(0);
+    }
+    const families = new Set(r.rhetoric!.marks.map((m) => m.family));
+    expect(families.has("agency-hiding")).toBe(true); // "were made"
+  });
+
+  test("rhetoric on clean prose is zero tells, not null", () => {
+    const r = scan("The library opens at nine. Chapter four discusses error handling in depth.", { html: false });
+    expect(r.rhetoric).not.toBeNull();
+    expect(r.rhetoric!.tells).toBe(0);
+    expect(r.rhetoric!.marks.length).toBe(0);
+  });
+
+  test("rhetoric reads the text layer of html, not the markup", () => {
+    const r = scan("<div data-x='guaranteed'><p>Mistakes were made.</p></div>", { html: true });
+    expect(r.rhetoric).not.toBeNull();
+    expect(r.rhetoric!.marks.some((m) => m.match.toLowerCase().includes("were made"))).toBe(true);
+  });
+
+  test("rhetoric marks are capped but the tell count stays honest", () => {
+    const spam = Array(60).fill("Mistakes were made.").join(" ");
+    const r = scan(spam, { html: false });
+    expect(r.rhetoric).not.toBeNull();
+    expect(r.rhetoric!.tells).toBeGreaterThan(24);
+    expect(r.rhetoric!.marks.length).toBeLessThanOrEqual(24);
+  });
+
+  test("rhetoric declares truncation on huge documents and stays fast", () => {
+    const huge = ("Mistakes were made. The library opens at nine. ").repeat(45_000); // ~2.1MB
+    const t0 = performance.now();
+    const r = scan(huge, { html: false });
+    const elapsed = performance.now() - t0;
+    expect(r.rhetoric).not.toBeNull();
+    expect(r.rhetoric!.truncated).toBe(true);
+    expect(r.rhetoric!.analyzedChars).toBe(100_000);
+    expect(r.rhetoric!.tells).toBeGreaterThan(0);
+    expect(elapsed).toBeLessThan(10_000); // the 2MB un-capped path measured 22-90s; capped must be far under
+  });
+
+  test("rhetoric never moves the FOMO score", () => {
+    // same FOMO trigger with and without extra rhetoric-only tells around it
+    const bare = scan("Only 2 left in stock.", { html: false });
+    const spun = scan("Everyone always knows mistakes were made. Only 2 left in stock.", { html: false });
+    expect(spun.score).toBe(bare.score);
+    expect(spun.rhetoric!.tells).toBeGreaterThan(bare.rhetoric!.tells);
+  });
 });

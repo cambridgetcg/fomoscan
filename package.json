@@ -9,6 +9,8 @@
     "scan": "bun run bin/fomoscan.ts"
   },
   "dependencies": {
+    "@rhetorlint/core": "^0.1.1",
+    "@rhetorlint/rules-en": "^0.1.0",
     "@x402/core": "^2.18.0",
     "@x402/svm": "^2.18.0"
   }
