@@ -1,3 +1,4 @@
+# Historical app mapping only. Deploy from cambridgetcg/fomoengine/fly-api.
 app = "fomoengine"
 primary_region = "lhr"
 

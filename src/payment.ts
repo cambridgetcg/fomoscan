@@ -1,21 +1,6 @@
-/** payment.ts — the x402 gate on the paid door (/scan).
- *
- * USDC on Solana via the official @x402/* SDK; the PayAI facilitator verifies
- * and settles (it fronts all network fees — we only hold a receiving address).
- *
- * House rules, in order of importance:
- *  1. The gate exists only when X402_PAYTO is set. Unset ⇒ the door is free
- *     (public-good default; enabling is a deliberate operator act).
- *  2. If the facilitator is down or hanging, the door falls OPEN, never
- *     closed — an outage may cost us revenue; it must never cost a guest
- *     the answer. A health probe (3s timeout, 60s cache) covers the
- *     warm-cache case; hard timeouts cover hangs mid-request.
- *  3. Never charge-and-withhold. A definitive settlement failure (the
- *     facilitator says no) withholds the answer — nobody was charged. An
- *     AMBIGUOUS settlement (timeout, unparseable response after a 200) may
- *     have charged the buyer, so the answer is delivered with a
- *     `payment-settlement: unknown` header instead of being withheld.
- *  4. A failed scan (4xx/5xx) is never charged.
+/** New scan payments are retired. Legacy environment flags cannot reopen them.
+ * The settlement implementation below is retained for historical inspection;
+ * existing receipts and recovery obligations are unchanged.
  */
 import {
   HTTPFacilitatorClient,
@@ -38,7 +23,8 @@ export function x402Config() {
   const payTo = (process.env.X402_PAYTO ?? "").trim();
   return {
     payTo,
-    enabled: payTo.length > 0,
+    enabled: false,
+    retired: true,
     network: process.env.X402_NETWORK ?? SOLANA_MAINNET,
     price: process.env.X402_PRICE ?? "$0.01",
     facilitator: process.env.X402_FACILITATOR ?? "https://facilitator.payai.network",
@@ -89,14 +75,14 @@ async function gateServer(): Promise<x402HTTPResourceServer | null> {
         contentType: "application/json",
         body: {
           error: "payment required",
-          hint: "retry with an x402 PAYMENT-SIGNATURE header; free doors: GET /manual, GET /honeypot",
+          hint: "New paid scans are retired; use the scan without a payment signature.",
         },
       }),
       settlementFailedResponseBody: () => ({
         contentType: "application/json",
         body: {
           error: "payment settlement failed — you were NOT charged",
-          hint: "the facilitator declined settlement (expired or unfundable payment?); sign a fresh payment and retry",
+          hint: "Investigate the existing receipt; do not sign a new payment.",
         },
       }),
     };

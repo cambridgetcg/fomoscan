@@ -1,7 +1,7 @@
 import { scan } from "./detect.ts";
 import { MANUAL } from "./manual.ts";
 import { HONEYPOT_HTML } from "./honeypot.ts";
-import { gateScan, x402Config } from "./payment.ts";
+import { gateScan } from "./payment.ts";
 
 const PORT = Number(process.env.PORT ?? 4242);
 const FETCH_TIMEOUT_MS = 12_000;
@@ -72,7 +72,6 @@ export async function handle(req: Request): Promise<Response> {
     });
 
   if (pathname === "/") {
-    const x402 = x402Config();
     return json({
       service: "fomoengine",
       endpoints: {
@@ -82,18 +81,12 @@ export async function handle(req: Request): Promise<Response> {
         "GET /honeypot": "a deliberately dark-patterned page for testing (should score ~100)",
         "GET /openapi.json": "machine-readable door plan (OpenAPI 3)",
       },
-      pricing: x402.enabled
-        ? {
-            protocol: "x402",
-            paid: ["/scan"],
-            price: x402.price,
-            asset: "USDC",
-            network: x402.network,
-            payTo: x402.payTo,
-            free: ["/", "/manual", "/honeypot"],
-            note: "a failed scan is never charged; manual and honeypot stay free forever",
-          }
-        : { note: "all doors currently free", protocol: "x402-ready" },
+      pricing: {
+        purchases: "retired",
+        paid: [],
+        free: ["/", "/scan", "/manual", "/honeypot"],
+        note: "Scanning requires no payment. Existing receipts remain valid records.",
+      },
       artifact: MANUAL.artifact,
     });
   }
